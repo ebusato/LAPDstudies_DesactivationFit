@@ -10,11 +10,11 @@ void fit(double min, double max, TString name1, TString name2="", TString name3=
 	}
 	ch->GetEntry(0);
 	cout << ch->GetLeaf("T0")->GetValue() << endl;
-	TString toplot("RateBoard5/1e3 : (T0-");
+	TString toplot("RateLvsL3/1e3 : (T0-");
 	toplot += ch->GetLeaf("T0")->GetValue();
 	toplot += "+TimeStamp*1/64e6)/60.";
 	cout << toplot << endl;
-	ch->Draw(toplot.Data(), "Evt != 0 && Evt%50==0");
+	ch->Draw(toplot.Data(), "Evt != 0 && Evt%1==0");
 	TGraph *g = new TGraph(ch->GetSelectedRows(),ch->GetV2(),ch->GetV1());
 	g->SetMarkerSize(0.5);
 	g->Draw("ap");
@@ -25,7 +25,7 @@ void fit(double min, double max, TString name1, TString name2="", TString name3=
 	f->FixParameter(2,0.034); // 11C
 	//f->FixParameter(4,2.156); // 10C
  	f->FixParameter(4,0.34022); // 15O
-	//f->FixParameter(4,0);
+// 	f->FixParameter(4,0);
 	f->SetLineColor(kRed);
 g->Fit("f", "", "", min,max);
 	cout << "Period1 = " << TMath::Log(2)/f->GetParameter(2) << " minutes" << endl;
@@ -35,15 +35,21 @@ g->Fit("f", "", "", min,max);
 
 void fitExp()
 {
-	/*
-	fit(23.6, 140, "~/godaq_rootfiles/analysis_v2.11-calibG2/run83Mult2.root"
+	
+	/*fit(23.6, 140, "~/godaq_rootfiles/analysis_v2.11-calibG2/run83Mult2.root"
  	       ,"~/godaq_rootfiles/analysis_v2.11-calibG2/run84Mult2.root"
 // 	       ,"~/godaq_rootfiles/analysis_v2.11-calibG2/run85Mult2.root"
 	);*/
 	
-	
+	/*
 	fit(48.5, 180, "~/godaq_rootfiles/analysis_v2.11-calibG2/run91Mult2.root"
  	       ,"~/godaq_rootfiles/analysis_v2.11-calibG2/run92Mult2.root"
 // 	       ,"~/godaq_rootfiles/analysis_v2.11-calibG2/run85Mult2.root"
+	);*/
+
+	fit(30.2, 180, "~/godaq_rootfiles/analysis_v2.11-calibG2/run112Mult2.root"
+ 	       //,"~/godaq_rootfiles/analysis_v2.11-calibG2/run92Mult2.root"
+// 	       ,"~/godaq_rootfiles/analysis_v2.11-calibG2/run85Mult2.root"
 	);
+	
 }
