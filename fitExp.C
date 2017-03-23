@@ -25,6 +25,25 @@ Double_t twoexps(Double_t *x, Double_t *par) {
 	return exp1+exp2;
 }
 
+// par[0]: lambda
+// par[1]: time spill
+// par[2]: time pause
+// par[3]: rate
+Double_t funcBuildUp(Double_t* x, Double_t* par) {
+	double Nk = 0;
+	for(int i = 0; i < 1000; i++) {
+		double temp=1;
+		for(int j=0; j<i; j++) {
+			temp*=TMath::Exp(-1*par[0]*(par[1]+par[2]));
+		}
+		Nk+=temp;
+	}
+	Nk*=(1-TMath::Exp(-1*par[0]*par[1]));
+	Nk*=TMath::Exp(-1*par[0]*par[2]);
+	Nk*=par[3]/par[0];
+	return Nk;
+}
+
 TGraph* getGraph(TCut cut, TString name1, TString name2="", TString name3="") {
 	TChain* ch = new TChain("tree");
 	ch->Add(name1.Data());
@@ -107,6 +126,13 @@ void fitExp()
 	fit(func1exp, "", xmin, xmax, 0, 0.85, "Target HDPE 5#times5 cm", "~/godaq_rootfiles/analysis_v2.11-calibG2/run83Mult2.root"
  	       ,"~/godaq_rootfiles/analysis_v2.11-calibG2/run84Mult2.root");
 	
+	TF1* fBuildUp = new TF1("fBuildUp", funcBuildUp, 0, 23, 4);
+	fBuildUp->SetParameters(0.034, 3e-9/60., 37e-9/60., 1e5);
+	fBuildUp->Draw("same");
+	
+	c1->SaveAs("c1.png");
+	
+	/*
 	cout << "***** Target PMMA 5*5 cm ***********" << endl;
 	TCanvas* c2 = new TCanvas("c2","c2");
 	xmin = 48.5;
@@ -122,11 +148,13 @@ void fitExp()
 	fit(func2exps, "", xmin, xmax, 0, 1.6, "Target PMMA 5#times5 cm", 
 	    "~/godaq_rootfiles/analysis_v2.11-calibG2/run91Mult2.root",
 	    "~/godaq_rootfiles/analysis_v2.11-calibG2/run92Mult2.root");
-	
+	c2->SaveAs("c2.png");
 	
 	cout << "***** Target PMMA splitted ***********" << endl; 
 	TCanvas* c3 = new TCanvas("c3","c3");
 	xmin = 30.2;
 	xmax = 140;
 	fit(func2exps, "", xmin, xmax, 0, 1.8, "Target PMMA (splitted)", "~/godaq_rootfiles/analysis_v2.11-calibG2/run112Mult2.root");
+	c3->SaveAs("c3.png");
+	*/
 }
