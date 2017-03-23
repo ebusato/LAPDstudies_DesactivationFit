@@ -41,7 +41,7 @@ TGraph* getGraph(TCut cut, TString name1, TString name2="", TString name3="") {
 	toplot += initTime;
 	toplot += "+TimeStamp*1/64e6)/60.";
 	cout << toplot << endl;
-	ch->Draw(toplot.Data(), "Evt != 0 && Evt%100==0" && cut, "goff");
+	ch->Draw(toplot.Data(), "Evt != 0 && Evt%1==0" && cut, "goff");
 	TGraph *g = new TGraph(ch->GetSelectedRows(),ch->GetV2(),ch->GetV1());
 	g->SetMarkerSize(0.8);
 	
