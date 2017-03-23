@@ -5,7 +5,7 @@ Double_t LambdaToPeriod(Double_t lambda) {
 }
 
 Double_t exp(Double_t *x,Double_t *par) {
-      Double_t fitval = par[0] + par[1]*TMath::Exp(-1*par[2]*x[0]);
+      Double_t fitval = par[0] + par[1]*par[2]/60.*TMath::Exp(-1*par[2]*x[0]);
       return fitval;
 }
 
@@ -100,8 +100,9 @@ void fitExp()
 	double xmin = 23.6;
 	double xmax = 140;
 	TF1* func1exp = new TF1("f", exp, xmin, xmax, 3);
-	func1exp->SetParNames("Constant", "Norm","Lambda");
+	func1exp->SetParNames("Constant_c11", "N_C11","Lambda_C11");
 	func1exp->FixParameter(2, 0.034);
+	func1exp->SetParLimits(0,0,1000);
 	func1exp->SetLineColor(kRed);
 	fit(func1exp, "", xmin, xmax, 0, 0.85, "Target HDPE 5#times5 cm", "~/godaq_rootfiles/analysis_v2.11-calibG2/run83Mult2.root"
  	       ,"~/godaq_rootfiles/analysis_v2.11-calibG2/run84Mult2.root");
@@ -111,7 +112,7 @@ void fitExp()
 	xmin = 48.5;
 	xmax = 160;
 	TF1* func2exps = new TF1("f", twoexps, xmin, xmax, 6);
-	func2exps->SetParNames("Constant1", "Norm1","Lambda1", "Constant2", "Norm2","Lambda2");
+	func2exps->SetParNames("Constant_C11", "N_C11","Lambda_C11", "Constant_O15", "N_O15","Lambda_O15");
 	func2exps->FixParameter(2, 0.034);
 	func2exps->FixParameter(5, 0.34022);
 	func2exps->SetParLimits(0,0,1000);
