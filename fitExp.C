@@ -27,21 +27,58 @@ Double_t twoexps(Double_t *x, Double_t *par) {
 
 // par[0]: lambda
 // par[1]: time spill
-// par[2]: time pause
-// par[3]: rate
+// par[2]: rate
+// par[3]: constant (for gamma prompt contribution)
 Double_t funcBuildUp(Double_t* x, Double_t* par) {
-	double Nk = 0;
-	for(int i = 0; i < 1000; i++) {
-		double temp=1;
-		for(int j=0; j<i; j++) {
-			temp*=TMath::Exp(-1*par[0]*(par[1]+par[2]));
-		}
-		Nk+=temp;
+	double ak = 1;
+	double RFperiodsec = 1/24.85e6;
+	double RFperiodmin = RFperiodsec/60.;
+	double k = x[0]/RFperiodmin; // 24.85e6 is the RF frequency
+	//cout << "k=" << k << endl;
+// 	for(int i = 1; i < k-1; i++) {
+// 		cout << "i= " << i << endl;
+// 		double temp=1;
+// 		//for(int j=0; j<i; j++) {
+// 			temp*=TMath::Exp(-1*i*par[0]*(par[1]+par[2]));
+// 		//}
+// 		ak+=temp;
+// 	}
+	ak*=(1-TMath::Exp(-1*k*par[0]*RFperiodmin))/(1-TMath::Exp(-1*par[0]*RFperiodmin));
+	ak*=(1-TMath::Exp(-1*par[0]*par[1]));
+	ak*=TMath::Exp(-1*par[0]*(RFperiodmin - par[1]));
+	ak*=par[2];
+	ak+=par[3];
+	return ak;
+}
+
+Double_t expPlusBuildUp(Double_t* x, Double_t* par) {
+	Double_t* parExp = new Double_t[3];
+	parExp[0] = par[0];
+	parExp[1] = par[1];
+	parExp[2] = par[2];
+	Double_t exp1 = exp(x, parExp);
+	
+	Double_t* parBuildUp = new Double_t[5];
+	parBuildUp[0] = par[3];
+	parBuildUp[1] = par[4];
+	parBuildUp[2] = par[5];
+	parBuildUp[3] = par[6];
+	Double_t buildUp = funcBuildUp(x, parBuildUp);
+	
+	if(x[0] < 0.74) {
+		return 0;
 	}
-	Nk*=(1-TMath::Exp(-1*par[0]*par[1]));
-	Nk*=TMath::Exp(-1*par[0]*par[2]);
-	Nk*=par[3]/par[0];
-	return Nk;
+	else if(x[0] > 23.5) {
+		return exp1;
+	} 
+	return buildUp;
+}
+
+Double_t funcConst(Double_t *x, Double_t *par) {
+	if(x[0] < par[0] || x[0] > par[1]) {
+		return 0;
+	}
+	return par[2];
 }
 
 TGraph* getGraph(TCut cut, TString name1, TString name2="", TString name3="") {
@@ -79,15 +116,31 @@ void fit(TF1* f, TCut cut, double xmin, double xmax, double ymin, double ymax, T
 	PutText(0.5, 0.87, kBlack, "LAPD");
 	PutText(0.5, 0.8, kBlack, "Protons 65 MeV, I = 4.5 nA");
 	PutText(0.5, 0.73, kBlack, text.Data());
-	g->Fit("f", "", "", xmin,xmax);
+	g->Fit(f->GetName(), "", "", xmin,xmax);
 	cout << "Period1 = " << LambdaToPeriod(f->GetParameter(2)) << " minutes" << endl;
 	f->SetLineWidth(3);
+	
+	
 	TLegend* leg = new TLegend(0.55,0.45,0.85,0.65);
 	leg->SetBorderSize(0);
 	leg->AddEntry(g, "Observed", "pl");
-	if(f->GetNpar() == 3) {
-		leg->AddEntry(f, "Expected (^{11}C)", "l");
-		leg->SetY1(0.55);
+	if(f->GetNpar() == 7) {
+		leg->AddEntry(f, "Expected (Total)", "l");
+		TF1* fexpPlusBuildUp_1 = new TF1("fexpPlusBuildUp_1", expPlusBuildUp, 0, xmax, 7);
+		fexpPlusBuildUp_1->SetParameters(f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(3),f->GetParameter(4),f->GetParameter(5), 0);
+		fexpPlusBuildUp_1->SetLineColor(kRed);
+		fexpPlusBuildUp_1->SetLineWidth(2);
+		fexpPlusBuildUp_1->Draw("same");
+		leg->AddEntry(fexpPlusBuildUp_1, "Expected (^{11}C)", "l");
+		TF1* fConstant = new TF1("fConstant", funcConst, xmin, xmax, 3);
+		fConstant->SetParameters(0.74, 23.5, f->GetParameter(6));
+		fConstant->SetLineColor(kGreen+2);
+		fConstant->SetLineWidth(2);
+		fConstant->SetNpx(1e3);
+		fConstant->Draw("same");
+		leg->AddEntry(fConstant, "Expected (prompt #gamma)", "l");
+		leg->SetY1(0.45);
+		leg->SetX1(0.5);
 	}
 	if(f->GetNpar() == 6) {
 		TF1* func2exps_1 = new TF1("func2exps_1", exp, xmin, xmax, 3);
@@ -123,16 +176,24 @@ void fitExp()
 	func1exp->FixParameter(2, 0.034);
 	func1exp->SetParLimits(0,0,1000);
 	func1exp->SetLineColor(kRed);
-	fit(func1exp, "", xmin, xmax, 0, 0.85, "Target HDPE 5#times5 cm", "~/godaq_rootfiles/analysis_v2.11-calibG2/run83Mult2.root"
+	
+	xmin = 0;
+	TF1* fexpPlusBuildUp = new TF1("fexpPlusBuildUp", expPlusBuildUp, 0, xmax, 7);
+	fexpPlusBuildUp->SetNpx(1000);
+	fexpPlusBuildUp->SetParLimits(0,0,1000);
+	//fexpPlusBuildUp->FixParameter(0,0);
+	fexpPlusBuildUp->SetParameter(1,1843);
+	fexpPlusBuildUp->FixParameter(2,0.034);
+	fexpPlusBuildUp->FixParameter(3,0.034);
+	fexpPlusBuildUp->SetParameter(4,3.7e-9/60.);
+	fexpPlusBuildUp->SetParameter(5,10);
+	fexpPlusBuildUp->SetParameter(6,0.28);
+	fexpPlusBuildUp->SetLineColor(kBlue);
+	
+	fit(fexpPlusBuildUp, "", xmin, xmax, 0, 0.85, "Target HDPE 5#times5 cm", "~/godaq_rootfiles/analysis_v2.11-calibG2/run83Mult2.root"
  	       ,"~/godaq_rootfiles/analysis_v2.11-calibG2/run84Mult2.root");
-	
-	TF1* fBuildUp = new TF1("fBuildUp", funcBuildUp, 0, 23, 4);
-	fBuildUp->SetParameters(0.034, 3e-9/60., 37e-9/60., 1e5);
-	fBuildUp->Draw("same");
-	
 	c1->SaveAs("c1.png");
 	
-	/*
 	cout << "***** Target PMMA 5*5 cm ***********" << endl;
 	TCanvas* c2 = new TCanvas("c2","c2");
 	xmin = 48.5;
@@ -156,5 +217,5 @@ void fitExp()
 	xmax = 140;
 	fit(func2exps, "", xmin, xmax, 0, 1.8, "Target PMMA (splitted)", "~/godaq_rootfiles/analysis_v2.11-calibG2/run112Mult2.root");
 	c3->SaveAs("c3.png");
-	*/
+	
 }
