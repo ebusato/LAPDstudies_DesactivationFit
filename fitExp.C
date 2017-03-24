@@ -138,9 +138,12 @@ void fit(TF1* f, TCut cut, double xmin, double xmax, double ymin, double ymax, T
 		fConstant->SetLineWidth(2);
 		fConstant->SetNpx(1e3);
 		fConstant->Draw("same");
-		leg->AddEntry(fConstant, "Expected (prompt #gamma)", "l");
-		leg->SetY1(0.45);
-		leg->SetX1(0.5);
+		leg->AddEntry(fConstant, "#splitline{Expected (prompt #gamma}{ + other short lived isotopes)}", "l");
+		leg->SetX1(0.4555874);
+		leg->SetY1(0.3757962);
+		leg->SetX2(0.8495702);
+		leg->SetY2(0.6518047);
+		
 	}
 	if(f->GetNpar() == 6) {
 		TF1* func2exps_1 = new TF1("func2exps_1", exp, xmin, xmax, 3);
@@ -194,6 +197,7 @@ void fitExp()
  	       ,"~/godaq_rootfiles/analysis_v2.11-calibG2/run84Mult2.root");
 	c1->SaveAs("c1.png");
 	
+	/*
 	cout << "***** Target PMMA 5*5 cm ***********" << endl;
 	TCanvas* c2 = new TCanvas("c2","c2");
 	xmin = 48.5;
@@ -217,5 +221,5 @@ void fitExp()
 	xmax = 140;
 	fit(func2exps, "", xmin, xmax, 0, 1.8, "Target PMMA (splitted)", "~/godaq_rootfiles/analysis_v2.11-calibG2/run112Mult2.root");
 	c3->SaveAs("c3.png");
-	
+	*/
 }
