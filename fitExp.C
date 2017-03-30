@@ -113,9 +113,9 @@ void fit(TF1* f, TCut cut, double xmin, double xmax, double ymin, double ymax, T
 	g->GetYaxis()->SetTitle("rate (MHz)");
 	gPad->SetGridx();
 	gPad->SetGridy();
-	PutText(0.5, 0.87, kBlack, "LAPD");
-	PutText(0.5, 0.8, kBlack, "Protons 65 MeV, I = 4.5 nA");
-	PutText(0.5, 0.73, kBlack, text.Data());
+	PutText(0.45, 0.82, kBlack, "LAPD");
+	PutText(0.45, 0.75, kBlack, "Protons 65 MeV, I = 4.5 nA");
+	PutText(0.45, 0.68, kBlack, text.Data());
 	g->Fit(f->GetName(), "", "", xmin,xmax);
 	cout << "Period1 = " << LambdaToPeriod(f->GetParameter(2)) << " minutes" << endl;
 	f->SetLineWidth(3);
@@ -188,7 +188,7 @@ void fitExp()
 	fexpPlusBuildUp->SetParameter(1,1843);
 	fexpPlusBuildUp->FixParameter(2,0.034);
 	fexpPlusBuildUp->FixParameter(3,0.034);
-	fexpPlusBuildUp->SetParameter(4,3.7e-9/60.);
+	fexpPlusBuildUp->FixParameter(4,3.7e-9/60.);
 	fexpPlusBuildUp->SetParameter(5,10);
 	fexpPlusBuildUp->SetParameter(6,0.28);
 	fexpPlusBuildUp->SetLineColor(kBlue);
