@@ -193,8 +193,8 @@ void fitExp()
 	fexpPlusBuildUp->SetParameter(6,0.28);
 	fexpPlusBuildUp->SetLineColor(kBlue);
 	
-	fit(fexpPlusBuildUp, "", xmin, xmax, 0, 0.85, "Target HDPE 5#times5 cm", "~/godaq_rootfiles/analysis_v2.11-calibG2/run83Mult2.root"
- 	       ,"~/godaq_rootfiles/analysis_v2.11-calibG2/run84Mult2.root");
+	fit(fexpPlusBuildUp, "", xmin, xmax, 0, 0.85, "Target HDPE 5#times5 cm", "~/godaq_rootfiles/analysis_v3.2-calibG2/run83LOR.root"
+ 	       ,"~/godaq_rootfiles/analysis_v3.2-calibG2/run84LOR.root");
 	c1->SaveAs("c1.png");
 	
 	/*
