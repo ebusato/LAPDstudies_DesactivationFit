@@ -111,6 +111,12 @@ void fit(TF1* f, TCut cut, double xmin, double xmax, double ymin, double ymax, T
 	g->Draw("ap");
 	g->GetXaxis()->SetTitle("time (minutes)");
 	g->GetYaxis()->SetTitle("rate (MHz)");
+	g->GetXaxis()->SetTitleSize(0.05);
+	g->GetYaxis()->SetTitleSize(0.05);
+	g->GetXaxis()->SetTitleOffset(1.25);
+	g->GetYaxis()->SetTitleOffset(1.5);
+	g->GetXaxis()->SetLabelSize(0.05);
+	g->GetYaxis()->SetLabelSize(0.05);
 	gPad->SetGridx();
 	gPad->SetGridy();
 	PutText(0.45, 0.82, kBlack, "LAPD");
@@ -119,9 +125,10 @@ void fit(TF1* f, TCut cut, double xmin, double xmax, double ymin, double ymax, T
 	g->Fit(f->GetName(), "", "", xmin,xmax);
 	cout << "Period1 = " << LambdaToPeriod(f->GetParameter(2)) << " minutes" << endl;
 	f->SetLineWidth(3);
+	gPad->Update();
 	
-	
-	TLegend* leg = new TLegend(0.55,0.45,0.85,0.65);
+	//TLegend* leg = new TLegend(0.5,0.36,0.83,0.61);
+	TLegend* leg = new TLegend(0.5,0.36,0.83,0.59);
 	leg->SetBorderSize(0);
 	leg->AddEntry(g, "Observed", "pl");
 	if(f->GetNpar() == 7) {
@@ -138,12 +145,7 @@ void fit(TF1* f, TCut cut, double xmin, double xmax, double ymin, double ymax, T
 		fConstant->SetLineWidth(2);
 		fConstant->SetNpx(1e3);
 		fConstant->Draw("same");
-		leg->AddEntry(fConstant, "#splitline{Expected (prompt #gamma}{ + other short lived isotopes)}", "l");
-		leg->SetX1(0.4555874);
-		leg->SetY1(0.3757962);
-		leg->SetX2(0.8495702);
-		leg->SetY2(0.6518047);
-		
+		leg->AddEntry(fConstant, "Expected (prompt)", "l");
 	}
 	if(f->GetNpar() == 6) {
 		TF1* func2exps_1 = new TF1("func2exps_1", exp, xmin, xmax, 3);
@@ -192,10 +194,19 @@ void fitExp()
 	fexpPlusBuildUp->SetParameter(5,10);
 	fexpPlusBuildUp->SetParameter(6,0.28);
 	fexpPlusBuildUp->SetLineColor(kBlue);
-	
-	fit(fexpPlusBuildUp, "", xmin, xmax, 0, 0.85, "Target HDPE 5#times5 cm", "~/godaq_rootfiles/analysis_v3.2-calibG2/run83LOR.root"
+
+	/*
+	fexpPlusBuildUp->GetXaxis()->SetTitleSize(0.06);
+	fexpPlusBuildUp->GetYaxis()->SetTitleSize(0.06);
+	fexpPlusBuildUp->GetXaxis()->SetTitleOffset(1.25);
+	fexpPlusBuildUp->GetYaxis()->SetTitleOffset(1.1);
+	fexpPlusBuildUp->GetXaxis()->SetLabelSize(0.06);
+	fexpPlusBuildUp->GetYaxis()->SetLabelSize(0.06);
+	*/
+
+	fit(fexpPlusBuildUp, "", xmin, xmax, 0, 0.95, "Target HDPE 5#times5#times5 cm^{3}", "~/godaq_rootfiles/analysis_v3.2-calibG2/run83LOR.root"
  	       ,"~/godaq_rootfiles/analysis_v3.2-calibG2/run84LOR.root");
-	c1->SaveAs("c1.png");
+	c1->SaveAs("ActDesactHDPE.png");
 	
 	/*
 	cout << "***** Target PMMA 5*5 cm ***********" << endl;
