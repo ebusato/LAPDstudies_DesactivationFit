@@ -109,8 +109,8 @@ void fit(TF1* f, TCut cut, double xmin, double xmax, double ymin, double ymax, T
 	g->GetXaxis()->SetRangeUser(0, xmax+5);
 	g->GetYaxis()->SetRangeUser(ymin, ymax);
 	g->Draw("ap");
-	g->GetXaxis()->SetTitle("time (minutes)");
-	g->GetYaxis()->SetTitle("rate (MHz)");
+	g->GetXaxis()->SetTitle("Time [minutes]");
+	g->GetYaxis()->SetTitle("Rate [MHz]");
 	g->GetXaxis()->SetTitleSize(0.05);
 	g->GetYaxis()->SetTitleSize(0.05);
 	g->GetXaxis()->SetTitleOffset(1.25);
@@ -120,7 +120,7 @@ void fit(TF1* f, TCut cut, double xmin, double xmax, double ymin, double ymax, T
 	gPad->SetGridx();
 	gPad->SetGridy();
 	PutText(0.45, 0.82, kBlack, "LAPD");
-	PutText(0.45, 0.75, kBlack, "Protons 65 MeV, I = 4.5 nA");
+	PutText(0.45, 0.75, kBlack, "Protons 65 MeV, I = 5 nA");
 	PutText(0.45, 0.68, kBlack, text.Data());
 	g->Fit(f->GetName(), "", "", xmin,xmax);
 	cout << "Period1 = " << LambdaToPeriod(f->GetParameter(2)) << " minutes" << endl;
@@ -204,7 +204,7 @@ void fitExp()
 	fexpPlusBuildUp->GetYaxis()->SetLabelSize(0.06);
 	*/
 
-	fit(fexpPlusBuildUp, "", xmin, xmax, 0, 0.95, "Target HDPE 5#times5#times5 cm^{3}", "~/godaq_rootfiles/analysis_v3.2-calibG2/run83LOR.root"
+	fit(fexpPlusBuildUp, "", xmin, xmax, 0, 0.95, "HDPE target (5#times5#times5 cm^{3})", "~/godaq_rootfiles/analysis_v3.2-calibG2/run83LOR.root"
  	       ,"~/godaq_rootfiles/analysis_v3.2-calibG2/run84LOR.root");
 	c1->SaveAs("ActDesactHDPE.png");
 	
