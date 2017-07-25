@@ -130,7 +130,7 @@ void fit(TF1* f, TCut cut, double xmin, double xmax, double ymin, double ymax, T
 	//TLegend* leg = new TLegend(0.5,0.36,0.83,0.61);
 	TLegend* leg = new TLegend(0.5,0.36,0.83,0.59);
 	leg->SetBorderSize(0);
-	leg->AddEntry(g, "Observed", "pl");
+	leg->AddEntry(g, "Observed", "p");
 	if(f->GetNpar() == 7) {
 		leg->AddEntry(f, "Expected (Total)", "l");
 		TF1* fexpPlusBuildUp_1 = new TF1("fexpPlusBuildUp_1", expPlusBuildUp, 0, xmax, 7);
