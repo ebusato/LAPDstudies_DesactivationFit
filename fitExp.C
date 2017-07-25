@@ -97,10 +97,10 @@ TGraph* getGraph(TCut cut, TString name1, TString name2="", TString name3="") {
 	toplot += initTime;
 	toplot += "+TimeStamp*1/64e6)/60.";
 	cout << toplot << endl;
-	ch->Draw(toplot.Data(), "Evt != 0 && Evt%1==0" && cut, "goff");
+	ch->Draw(toplot.Data(), "Evt != 0 && Evt%1000==0" && cut, "goff");
 	TGraph *g = new TGraph(ch->GetSelectedRows(),ch->GetV2(),ch->GetV1());
 	g->SetMarkerSize(0.8);
-	
+	g->SetMarkerStyle(4);
 	return g;
 }
 
@@ -135,14 +135,16 @@ void fit(TF1* f, TCut cut, double xmin, double xmax, double ymin, double ymax, T
 		leg->AddEntry(f, "Expected (Total)", "l");
 		TF1* fexpPlusBuildUp_1 = new TF1("fexpPlusBuildUp_1", expPlusBuildUp, 0, xmax, 7);
 		fexpPlusBuildUp_1->SetParameters(f->GetParameter(0),f->GetParameter(1),f->GetParameter(2),f->GetParameter(3),f->GetParameter(4),f->GetParameter(5), 0);
-		fexpPlusBuildUp_1->SetLineColor(kRed);
+		fexpPlusBuildUp_1->SetLineColor(kBlack);
+		fexpPlusBuildUp_1->SetLineStyle(9);
 		fexpPlusBuildUp_1->SetLineWidth(2);
 		fexpPlusBuildUp_1->Draw("same");
 		leg->AddEntry(fexpPlusBuildUp_1, "Expected (^{11}C)", "l");
 		TF1* fConstant = new TF1("fConstant", funcConst, xmin, xmax, 3);
 		fConstant->SetParameters(0.74, 23.5, f->GetParameter(6));
-		fConstant->SetLineColor(kGreen+2);
+		fConstant->SetLineColor(kBlack);
 		fConstant->SetLineWidth(2);
+		fConstant->SetLineStyle(2);
 		fConstant->SetNpx(1e3);
 		fConstant->Draw("same");
 		leg->AddEntry(fConstant, "Expected (prompt)", "l");
@@ -150,7 +152,7 @@ void fit(TF1* f, TCut cut, double xmin, double xmax, double ymin, double ymax, T
 	if(f->GetNpar() == 6) {
 		TF1* func2exps_1 = new TF1("func2exps_1", exp, xmin, xmax, 3);
 		func2exps_1->SetParameters(f->GetParameter(0),f->GetParameter(1),f->GetParameter(2));
-		func2exps_1->SetLineColor(kBlue);
+		func2exps_1->SetLineColor(kBlack);
 		func2exps_1->SetLineWidth(2);
 		func2exps_1->Draw("same");
 		TF1* func2exps_2 = new TF1("func2exps_2", exp, xmin, xmax, 3);
@@ -180,7 +182,8 @@ void fitExp()
 	func1exp->SetParNames("Constant_c11", "N_C11","Lambda_C11");
 	func1exp->FixParameter(2, 0.034);
 	func1exp->SetParLimits(0,0,1000);
-	func1exp->SetLineColor(kRed);
+	func1exp->SetLineColor(kBlack);
+	func1exp->SetLineStyle(3);
 	
 	xmin = 0;
 	TF1* fexpPlusBuildUp = new TF1("fexpPlusBuildUp", expPlusBuildUp, 0, xmax, 7);
@@ -193,7 +196,7 @@ void fitExp()
 	fexpPlusBuildUp->FixParameter(4,3.7e-9/60.);
 	fexpPlusBuildUp->SetParameter(5,10);
 	fexpPlusBuildUp->SetParameter(6,0.28);
-	fexpPlusBuildUp->SetLineColor(kBlue);
+	fexpPlusBuildUp->SetLineColor(kBlack);
 
 	/*
 	fexpPlusBuildUp->GetXaxis()->SetTitleSize(0.06);
@@ -204,7 +207,7 @@ void fitExp()
 	fexpPlusBuildUp->GetYaxis()->SetLabelSize(0.06);
 	*/
 
-	fit(fexpPlusBuildUp, "", xmin, xmax, 0, 0.95, "HDPE target (5#times5#times5 cm^{3})", "~/godaq_rootfiles/analysis_v3.2-calibG2/run83LOR.root"
+	fit(fexpPlusBuildUp, "", xmin, xmax, 0, 0.85, "HDPE target (5#times5#times5 cm^{3})", "~/godaq_rootfiles/analysis_v3.2-calibG2/run83LOR.root"
  	       ,"~/godaq_rootfiles/analysis_v3.2-calibG2/run84LOR.root");
 	c1->SaveAs("ActDesactHDPE.png");
 	
