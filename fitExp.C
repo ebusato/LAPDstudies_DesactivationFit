@@ -90,8 +90,8 @@ TGraph* getGraph(TCut cut, TString name1, TString name2="", TString name3="") {
 	if(name3!="") {
 		ch->Add(name3.Data());
 	}
-	TString toplot("RateLvsL3/1e6 : (T0-");
-	//TString toplot("RateBoard4/1e3 : (T0-");
+	//TString toplot("RateLvsL3/1e6 : (T0-");
+	TString toplot("RateLvsL3 : (T0-");
 	ch->GetEntry(0);
 	Double_t initTime = ch->GetLeaf("T0")->GetValue();
 	toplot += initTime;
@@ -110,7 +110,7 @@ void fit(TF1* f, TCut cut, double xmin, double xmax, double ymin, double ymax, T
 	g->GetYaxis()->SetRangeUser(ymin, ymax);
 	g->Draw("ap");
 	g->GetXaxis()->SetTitle("Time [minutes]");
-	g->GetYaxis()->SetTitle("Rate [MHz]");
+	g->GetYaxis()->SetTitle("Rate [cps]");
 	g->GetXaxis()->SetTitleSize(0.05);
 	g->GetYaxis()->SetTitleSize(0.05);
 	g->GetXaxis()->SetTitleOffset(1.25);
@@ -207,9 +207,10 @@ void fitExp()
 	fexpPlusBuildUp->GetYaxis()->SetLabelSize(0.06);
 	*/
 
-	fit(fexpPlusBuildUp, "", xmin, xmax, 0, 0.85, "HDPE target (5#times5#times5 cm^{3})", "~/godaq_rootfiles/analysis_v3.2-calibG2/run83LOR.root"
- 	       ,"~/godaq_rootfiles/analysis_v3.2-calibG2/run84LOR.root");
+	//fit(fexpPlusBuildUp, "", xmin, xmax, 0, 0.85, "HDPE target (5#times5#times5 cm^{3})", "~/godaq_rootfiles/analysis_v3.2-calibG2/run83LOR.root","~/godaq_rootfiles/analysis_v3.2-calibG2/run84LOR.root");
+	fit(fexpPlusBuildUp, "", xmin, xmax, 0, 8.5e5, "HDPE target (5#times5#times5 cm^{3})", "~/godaq_rootfiles/analysis_v3.2-calibG2/run83LOR.root","~/godaq_rootfiles/analysis_v3.2-calibG2/run84LOR.root");
 	c1->SaveAs("ActDesactHDPE.png");
+	c1->SaveAs("ActDesactHDPE.pdf");
 	
 	/*
 	cout << "***** Target PMMA 5*5 cm ***********" << endl;
